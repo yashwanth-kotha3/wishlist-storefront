@@ -1,4 +1,4 @@
-const { PRODUCTS, loadState, saveState, createList, renameList, deleteList,
+const { PRODUCTS, loadState, saveState, createList, renameList, deleteList, isListNameTaken,
         addItemToList, setItemQuantity, removeItemFromList, mergeLists } = window.WishlistData;
 
 let state = loadState();
@@ -24,6 +24,7 @@ const modalOverlay = document.getElementById("modalOverlay");
 const modalTitle = document.getElementById("modalTitle");
 const modalMessage = document.getElementById("modalMessage");
 const modalInput = document.getElementById("modalInput");
+const modalError = document.getElementById("modalError");
 const modalCancel = document.getElementById("modalCancel");
 const modalConfirm = document.getElementById("modalConfirm");
 
@@ -36,13 +37,15 @@ function persist() {
 // even block execution there), and look inconsistent with the rest of the
 // UI. showModal(opts) drives the same #modalOverlay markup for both an
 // input prompt and a yes/no confirm depending on whether opts.input is set.
-function showModal({ title, message, input = false, defaultValue = "" }) {
+function showModal({ title, message, input = false, defaultValue = "", validate }) {
   return new Promise((resolve) => {
     modalTitle.textContent = title;
     modalMessage.textContent = message || "";
     modalMessage.classList.toggle("hidden", !message);
     modalInput.classList.toggle("hidden", !input);
     modalInput.value = defaultValue;
+    modalError.textContent = "";
+    modalError.classList.add("hidden");
     modalOverlay.classList.remove("hidden");
     if (input) modalInput.focus();
 
@@ -54,7 +57,20 @@ function showModal({ title, message, input = false, defaultValue = "" }) {
       resolve(result);
     }
     function onConfirm() {
-      cleanup(input ? modalInput.value.trim() || null : true);
+      if (!input) {
+        cleanup(true);
+        return;
+      }
+      const value = modalInput.value.trim();
+      if (value && validate) {
+        const error = validate(value);
+        if (error) {
+          modalError.textContent = error;
+          modalError.classList.remove("hidden");
+          return; // keep the modal open so the user can correct it
+        }
+      }
+      cleanup(value || null);
     }
     function onCancel() {
       cleanup(input ? null : false);
@@ -70,8 +86,8 @@ function showModal({ title, message, input = false, defaultValue = "" }) {
   });
 }
 
-function promptModal(title, defaultValue = "") {
-  return showModal({ title, input: true, defaultValue });
+function promptModal(title, defaultValue = "", validate) {
+  return showModal({ title, input: true, defaultValue, validate });
 }
 
 function confirmModal(title, message) {
@@ -203,8 +219,14 @@ listSelect.addEventListener("change", () => {
   renderAll();
 });
 
+function duplicateNameError(name, excludeListId) {
+  return isListNameTaken(state, name, excludeListId)
+    ? `A list named "${name}" already exists.`
+    : null;
+}
+
 newListBtn.addEventListener("click", async () => {
-  const name = await promptModal("New list name");
+  const name = await promptModal("New list name", "", (value) => duplicateNameError(value));
   if (!name) return;
   const list = createList(state, name);
   currentListId = list.id;
@@ -214,7 +236,9 @@ newListBtn.addEventListener("click", async () => {
 
 renameListBtn.addEventListener("click", async () => {
   const list = state.lists[currentListId];
-  const name = await promptModal("Rename list", list.name);
+  const name = await promptModal("Rename list", list.name, (value) =>
+    duplicateNameError(value, currentListId)
+  );
   if (!name) return;
   renameList(state, currentListId, name);
   persist();

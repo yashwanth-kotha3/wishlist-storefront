@@ -93,6 +93,13 @@ function setItemQuantity(state, listId, productId, quantity) {
   return true;
 }
 
+function isListNameTaken(state, name, excludeListId) {
+  const normalized = name.trim().toLowerCase();
+  return Object.values(state.lists).some(
+    (l) => l.id !== excludeListId && l.name.trim().toLowerCase() === normalized
+  );
+}
+
 function removeItemFromList(state, listId, productId) {
   const list = state.lists[listId];
   if (!list) return false;
@@ -129,6 +136,7 @@ window.WishlistData = {
   createList,
   renameList,
   deleteList,
+  isListNameTaken,
   addItemToList,
   setItemQuantity,
   removeItemFromList,

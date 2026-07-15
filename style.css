@@ -251,6 +251,14 @@ body {
 
 .modal-input.hidden { display: none; }
 
+.modal-error {
+  color: #b33;
+  font-size: 0.8rem;
+  margin: -0.6rem 0 0.75rem;
+}
+
+.modal-error.hidden { display: none; }
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
