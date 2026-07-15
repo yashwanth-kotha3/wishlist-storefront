@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront — Wishlist Demo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>Small Goods Co.</h1>
+  <button id="wishlistToggle" class="wishlist-toggle">
+    Wishlist <span id="wishlistCount" class="badge">0</span>
+  </button>
+</header>
+
+<main>
+  <section id="productGrid" class="product-grid"></section>
+</main>
+
+<aside id="wishlistPanel" class="wishlist-panel hidden">
+  <div class="wishlist-panel-header">
+    <h2>Wishlists</h2>
+    <button id="closePanel" class="icon-btn" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="list-controls">
+    <select id="listSelect"></select>
+    <button id="newListBtn" title="New list">+ New</button>
+    <button id="renameListBtn" title="Rename current list">Rename</button>
+    <button id="deleteListBtn" title="Delete current list">Delete</button>
+  </div>
+
+  <div class="merge-controls">
+    <label for="mergeSelect">Merge into current list from:</label>
+    <div class="merge-row">
+      <select id="mergeSelect"></select>
+      <button id="mergeBtn">Merge</button>
+    </div>
+    <p id="mergeHint" class="hint"></p>
+  </div>
+
+  <ul id="wishlistItems" class="wishlist-items"></ul>
+  <p id="emptyHint" class="hint hidden">This list is empty.</p>
+</aside>
+
+<div id="toast" class="toast hidden"></div>
+
+<div id="modalOverlay" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMessage" class="modal-message"></p>
+    <input id="modalInput" class="modal-input" type="text">
+    <div class="modal-actions">
+      <button id="modalCancel" class="modal-btn-secondary">Cancel</button>
+      <button id="modalConfirm" class="modal-btn-primary">OK</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
